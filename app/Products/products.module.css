@@ -1,0 +1,29 @@
+.products {
+  width: 100vw;
+  height: 100vh;
+  background-color: #bb2cd9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.heading {
+  margin-bottom: 2vh;
+}
+
+.productViewer {
+  width: 60vw;
+  height: 80vh;
+  overflow: hidden;
+  overflow-y: scroll;
+}
+
+.grid {
+  position: relative;
+}
+
+.productWrapper {
+  min-height: 60vh;
+  width: 17vw;
+}
