@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback, memo } from "react";
 import styles from "./products.module.css";
 import { getProducts } from "../apicalls/apicalls";
 import { Grid } from "@mui/material";
@@ -13,8 +13,12 @@ import {
 } from "@dnd-kit/sortable";
 
 const Products = () => {
+  // State to hold products data
   const [products, setProducts]: any = useState([]);
-  const [selectedCard, setSelectedCard]: any = useState();
+  // State to hold the index of the selected card
+  const [selectedCard, setSelectedCard]: any = useState(0);
+
+  // Fetch products when the component mounts
   useEffect(() => {
     getProducts()
       .then((res) => {
@@ -25,25 +29,50 @@ const Products = () => {
       });
   }, []);
 
+  // Add event listener for keyboard navigation
   useEffect(() => {
-    console.log(selectedCard);
-  }, [selectedCard]);
+    window.addEventListener("keydown", detectKeyDown, true);
+    return () => {
+      window.removeEventListener("keydown", detectKeyDown);
+    };
+  }, []);
 
+  // Function to handle keyboard navigation
+  const detectKeyDown = (e: KeyboardEvent) => {
+    if (e.key === "ArrowLeft") {
+      console.log(selectedCard);
+      e.preventDefault();
+      setSelectedCard((prevCard: any) => prevCard - 1);
+    } else if (e.key === "ArrowRight") {
+      e.preventDefault();
+      setSelectedCard((prevCard: any) => prevCard + 1);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setSelectedCard((prevCard: any) => prevCard - 4);
+    } else if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setSelectedCard((prevCard: any) => prevCard + 4);
+    } else {
+    }
+  };
+
+  // Handle drag end event
   const handleDragEnd = (event: any) => {
     const { active, over } = event;
     let pro = products;
     let temp;
     console.log("Dreaged", active, over);
-    setSelectedCard(over?.id?.toString());
+    setSelectedCard(parseInt(over?.id));
     temp = pro[parseInt(active?.id)];
     pro[parseInt(active?.id)] = pro[parseInt(over?.id)];
     pro[parseInt(over?.id)] = temp;
     setProducts(pro);
   };
 
+  // Handle drag start event
   const handleDragStart = (event: any) => {
     const { active, over } = event;
-    setSelectedCard(active?.id?.toString());
+    setSelectedCard(parseInt(active?.id));
   };
 
   return (
@@ -64,9 +93,9 @@ const Products = () => {
                 {products?.map((item: ProductType, index: number) => (
                   <Grid
                     item
-                    xs={2}
-                    sm={4}
-                    md={4}
+                    xs={3}
+                    sm={3}
+                    md={3}
                     key={index}
                     className={styles.grid}
                   >
@@ -76,7 +105,7 @@ const Products = () => {
                       price={item?.price}
                       desc={item?.description}
                       Image={item?.image}
-                      showCard={index?.toString() === selectedCard}
+                      showCard={index?.toString() === selectedCard?.toString()}
                     />
                   </Grid>
                 ))}
@@ -91,4 +120,4 @@ const Products = () => {
   );
 };
 
-export default Products;
+export default memo(Products);
